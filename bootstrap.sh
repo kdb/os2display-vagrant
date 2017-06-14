@@ -24,8 +24,8 @@ cat > /etc/apt/sources.list.d/dotdeb.list <<DELIM
 deb http://packages.dotdeb.org wheezy all
 deb-src http://packages.dotdeb.org wheezy all
 
-deb http://packages.dotdeb.org wheezy-php55 all
-deb-src http://packages.dotdeb.org wheezy-php55 all
+deb http://packages.dotdeb.org wheezy-php56 all
+deb-src http://packages.dotdeb.org wheezy-php56 all
 DELIM
 wget http://www.dotdeb.org/dotdeb.gpg > /dev/null 2>&1
 apt-key add dotdeb.gpg  > /dev/null 2>&1
@@ -68,7 +68,7 @@ apt-get install -y memcached php5-memcached > /dev/null 2>&1
 echo "Configuring APC"
 apt-get install -y php-apc > /dev/null 2>&1
 
-cat > /etc/php5/conf.d/apc.ini <<DELIM
+cat > /etc/php5/fpm/conf.d/apc.ini <<DELIM
 apc.enabled=1
 apc.shm_segments=1
 apc.optimization=0
@@ -84,7 +84,7 @@ DELIM
 # x-debug
 echo "Configure x-debug"
 
-cat << DELIM >> /etc/php5/conf.d/20-xdebug.ini
+cat << DELIM >> /etc/php5/fpm/conf.d/20-xdebug.ini
 xdebug.remote_enable=1
 xdebug.remote_handler=dbgp
 xdebug.remote_host=192.168.50.1

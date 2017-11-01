@@ -14,7 +14,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Shared folder
   config.vm.synced_folder ".", "/vagrant",
     :nfs => true,
-    :mount_options => ['actimeo=2']
+    :mount_options => ['actimeo=2', 'nolock', 'vers=3', 'tcp', 'fsc', 'rw', 'noatime']
 
   # Hostname(s)
   config.vm.hostname = "os2display.vm"

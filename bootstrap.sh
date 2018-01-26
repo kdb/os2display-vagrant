@@ -56,6 +56,8 @@ sed -i '/;listen.mode = 0660/c listen.mode = 0660' /etc/php5/fpm/pool.d/www.conf
 # Set php memory limit to 256mb
 sed -i '/memory_limit = 128M/c memory_limit = 256M' /etc/php5/fpm/php.ini
 
+/etc/init.d/php5-fpm restart
+
 # Redis
 echo "Installing redis"
 apt-get install -y redis-server > /dev/null 2>&1

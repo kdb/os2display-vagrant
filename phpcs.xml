@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="os2display">
+    <rule ref="Symfony"/>
+    <!-- Opt in for now -->
+    <file>htdocs/admin/src/Kkb</file>
+</ruleset>

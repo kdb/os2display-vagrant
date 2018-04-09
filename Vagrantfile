@@ -18,7 +18,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Hostname(s)
   config.vm.hostname = "os2display.vm"
-  config.hostsupdater.aliases = ["screen.os2display.vm", "admin.os2display.vm", "search.os2display.vm", "middleware.os2display.vm", "styleguide.os2display.vm"]
+  config.hostsupdater.aliases = ["screen.os2display.vm", "admin.os2display.vm", "search.os2display.vm", "middleware.os2display.vm"]
 
   # What to install
   config.vm.provision :shell, :path => "bootstrap.sh"

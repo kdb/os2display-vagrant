@@ -1,59 +1,85 @@
 #!/usr/bin/env bash
-bold=$(tput bold)
-normal=$(tput sgr0)
+set -euo pipefail
+BOLD=$(tput bold)
+NORMAL=$(tput sgr0)
 
-script_dir=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
-dir=$(cd $(dirname "${BASH_SOURCE[0]}")/../htdocs/ && pwd)
+SCRIPT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+# Main checkout dir.
+HTDOCS_DIR=$(cd $(dirname "${BASH_SOURCE[0]}")/../htdocs/ && pwd)
+# Extension bundles.
+BUNDLES_DIR="${HTDOCS_DIR}/bundles"
 
+# Fetch a bundle directly from git to set us up for development.
 get_bundles() {
-	bundles_dir=$dir/bundles
-	mkdir -p $bundles_dir/$name
-	cd $bundles_dir/$name
+	organization=$1
+	bundles=$2
+	
+	mkdir -p "$BUNDLES_DIR/$organization"
+	cd "$BUNDLES_DIR/$organization"
 	for bundle in ${bundles[@]}; do
 		tokens=(${bundle//@/ })
 		repo=${tokens[0]}
+		# Fall back to master branch if we don't have a revision specified.
 		branch=${tokens[1]:-master}
-		echo "${bold}$name/$repo@$branch -> $bundles_dir/$name/$repo${normal}"
-		if [ ! -d $repo ]; then
-				git clone https://github.com/$name/$repo.git
+		echo "Cloning ${BOLD}$organization/$repo@$branch -> $BUNDLES_DIR/$organization/$repo${NORMAL}"
+		if [ ! -d ${repo} ]; then
+				git clone "https://github.com/$organization/$repo.git"
 		fi
-		git -C $repo fetch --quiet
-		git -C $repo checkout $branch --quiet
-		git -C $repo log --oneline --max-count=1
+		pushd "$repo"
+		git fetch --quiet
+		git checkout "$branch" --quiet || (echo "Could not find revision revision $branch" && exit 1)
+		git log --oneline --max-count=1
+		popd
 		echo
 	done
 }
 
-name=itk-os2display
-bundles=(
-		aarhus-data-bundle@1.1.1
-		aarhus-second-template-bundle@1.0.4
-		admin-bundle@1.0.13
-		campaign-bundle@develop
-		core-bundle@1.0.14
-		default-template-bundle@1.0.8
-		exchange-bundle@1.0.1
-		horizon-template-bundle@1.0.3
-		lokalcenter-template-bundle@1.0.5
-		media-bundle@1.0.2
-		template-extension-bundle@1.1.11
-		vimeo-bundle@1.0.1
-		os2display-koba-integration@1.0.5
-)
+# Inject custom bundles into composer
+configure_composer() {
+	organization=$1
+	bundles=$2
 
-get_bundles
+    pushd "${HTDOCS_DIR}/admin"
+	for bundle in ${bundles[@]}; do
+		tokens=(${bundle//@/ })
+		repo=${tokens[0]}
+		branch=${tokens[1]:-master}
 
-name=aakb
-bundles=(
-	os2display-aarhus-templates@1.0.15
-)
+		echo "Patching ${BOLD}../bundles/$organization/$repo${NORMAL} into composer-dev.json"
 
-get_bundles
+		COMPOSER=composer-dev.json composer config repositories.$organization/$repo path ../bundles/$organization/$repo
+	done
+    popd
+}
+
+#TODO function
+# Prepare our "own" composer-json
+ADMIN_DIR="${HTDOCS_DIR}/admin"
+
+if [ ! -e "${ADMIN_DIR}/composer.json" ]; then
+		(>&2 echo File composer.json not found in "${ADMIN_DIR}")
+		exit 1
+fi
+
+if [ -e "${ADMIN_DIR}/composer-dev.json" ]; then
+		(>&2 echo File "composer-dev.json" already exists in "${ADMIN_DIR}")
+		# We assume this is not an error, so clean exit.
+		exit
+fi
+cp -v "${ADMIN_DIR}/composer.json" "${ADMIN_DIR}/composer-dev.json"
+
+# For each bundle-file in bundle.d, source it and fetch the bundle
+for f in $(find ${SCRIPT_DIR}/bundle.d/ -name "*.bundle"); do
+	source $f;
+	get_bundles $organization $bundles
+	# Customize a -dev composer json to fetch dependencies.
+	configure_composer $organization $bundles
+done
 
 cat <<EOF
 
-To install stuff, run:
+Bundles has been cloned, now to install them:
 
- $script_dir/install_dev.sh
+ $SCRIPT_DIR/install_dev.sh
 
 EOF

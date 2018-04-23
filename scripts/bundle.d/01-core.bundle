@@ -1,0 +1,10 @@
+# Stock bundles required by os2display.
+# Bundle <name>@<revision> must be available at 
+# github.com/<organization>/<name> and have a <revision> revision.
+organization=os2display
+bundles=(
+		admin-bundle@1.0.10
+		core-bundle@1.0.10
+		default-template-bundle@1.0.4
+		media-bundle@1.0.2
+)

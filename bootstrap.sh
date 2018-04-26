@@ -814,7 +814,6 @@ update-rc.d elasticsearch defaults 95 10 > /dev/null 2>&1
 
 # Install gulp
 npm install --global gulp > /dev/null 2>&1
-su --login vagrant -c "cd /vagrant/htdocs/admin && npm install" > /dev/null 2>&1
 su --login vagrant -c "cd /vagrant/htdocs/screen && npm install" > /dev/null 2>&1
 
 # Add symlink.
@@ -842,10 +841,11 @@ echo "Starting middleware"
 service middleware start > /dev/null 2>&1
 
 echo "Adding crontab"
-crontab -l > mycron
-echo "*/1 * * * * /usr/bin/php /vagrant/htdocs/admin/app/console os2display:core:cron" >> mycron
-crontab mycron
-rm mycron
+# Pipe any existing crontab to current_crontab
+(crontab -l > /dev/null && crontab -l > current_crontab) || true
+echo "*/1 * * * * /usr/bin/php /vagrant/htdocs/admin/app/console os2display:core:cron" >> current_crontab
+crontab current_crontab
+rm current_crontab
 
 # Set up MailHog
 mkdir -p /opt/mailhog/bin

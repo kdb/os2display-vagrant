@@ -21,19 +21,34 @@ scripts/setup_htdocs.sh
 scripts/install_bundles.sh
 </pre>
 
-Start the vagrant.
+## Start - stable mode
+The vagrant setup will pr default start up in "stable" mode where the bundles 
+that makes up OS2Display are installed in a stable un-modifiable form. This mode
+is ideal for trying out and demoing OS2Display
+
 <pre>
 vagrant up
 </pre>
 
-Run install_dev script inde fra vagranten:
+## Start - development mode
 
+By specifying `MODE=dev` when starting up vagrant all custom bundles will be 
+installed via git to better support development. 
 <pre>
-vagrant ssh
-scripts/install_dev.sh
+MODE=dev vagrant up
 </pre>
 
+
+## Post-install configuration
 When the vagrant is done bootstrapping the VM you need to activate the search index by logging into http://search.os2display.vm and click the _indexes_ tab. Then click the _activate_ links foreach index.
+
+The administrative interface can subsequently be accessed via http://admin.os2display.vm
+
+Be aware that you will see error-messages throughout the interface until you have
+created 1 instance of a 
+- Slide
+- Channel
+- Screen
 
 # Troubleshoot
 

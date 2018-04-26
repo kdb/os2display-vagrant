@@ -11,6 +11,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vb.customize ["modifyvm", :id, "--memory", "2048"]
   end
 
+  # To ensure access to eg. github.
+  config.ssh.forward_agent = true
+
   # Shared folder
   config.vm.synced_folder ".", "/vagrant",
     :nfs => true,
@@ -21,5 +24,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.hostsupdater.aliases = ["screen.os2display.vm", "admin.os2display.vm", "search.os2display.vm", "middleware.os2display.vm"]
 
   # What to install
-  config.vm.provision :shell, :path => "bootstrap.sh"
+  config.vm.provision "shell" do |s|
+      s.env = { MODE: ENV['MODE'] || 'stable' }
+      s.path = "bootstrap.sh"
+  end
 end

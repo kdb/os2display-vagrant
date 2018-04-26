@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+set -eo pipefail
+
+if [[ $MODE == 'dev' ]]; then
+    echo "Provisioning in DEVELOPMENT mode - git-cloned bundles will be used"
+fi
 
 # APT
 echo "Updating APT"
@@ -760,7 +765,25 @@ parameters:
     itk_log_log_level: all
 DELIM
 
-composer install > /dev/null 2>&1
+# If we're in dev mode, clone bundles and patch composer.json prior to
+# installing.
+
+if [[ $MODE == 'dev' ]]; then
+    su --login vagrant -c "/vagrant/scripts/install_bundles.sh"
+fi
+
+# Use the dev override composer if available.
+echo "Composer installing admin, this will take a while..."
+
+# We disable xdebug while composer is running to give us a bit more speed.
+php5dismod -s cli xdebug
+if [[ -f composer-dev.json ]]; then
+    su --login vagrant -c "cd /vagrant/htdocs/admin && COMPOSER=composer-dev.json composer install"  > /dev/null 2>&1
+else
+    su --login vagrant -c "cd /vagrant/htdocs/admin && composer install > /dev/null" 2>&1
+fi
+php5enmod -s cli xdebug
+
 app/console doctrine:migrations:migrate --no-interaction > /dev/null 2>&1
 
 # Setup super-user

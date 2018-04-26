@@ -72,21 +72,23 @@ echo "Installing memcache"
 apt-get install -y memcached php5-memcached > /dev/null 2>&1
 
 # APC
-echo "Configuring APC"
-apt-get install -y php-apc > /dev/null 2>&1
-
-cat > /etc/php5/fpm/conf.d/apc.ini <<DELIM
-apc.enabled=1
-apc.shm_segments=1
-apc.optimization=0
-apc.shm_size=64M
-apc.ttl=7200
-apc.user_ttl=7200
-apc.num_files_hint=1024
-apc.mmap_file_mask=/tmp/apc.XXXXXX
-apc.enable_cli=1
-apc.cache_by_default=1
-DELIM
+# APC is disabled until we find a way to get it installed, the version of
+# ubuntu we currently use is not able to resolve a package.
+# echo "Configuring APC"
+# apt-get install -y php-apc > /dev/null 2>&1
+#
+# cat > /etc/php5/fpm/conf.d/apc.ini <<DELIM
+# apc.enabled=1
+# apc.shm_segments=1
+# apc.optimization=0
+# apc.shm_size=64M
+# apc.ttl=7200
+# apc.user_ttl=7200
+# apc.num_files_hint=1024
+# apc.mmap_file_mask=/tmp/apc.XXXXXX
+# apc.enable_cli=1
+# apc.cache_by_default=1
+# DELIM
 
 # x-debug
 echo "Configure x-debug"

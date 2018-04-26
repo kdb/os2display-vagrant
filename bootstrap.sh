@@ -464,7 +464,7 @@ su vagrant -c "cd /vagrant/htdocs/search_node && ./install.sh" > /dev/null 2>&1
 # Search node requirements
 echo "Installing middleware requirements"
 # @TODO: remove this when logger plugin can handle a non-existing directory
-mkdir /vagrant/htdocs/middleware/logs
+test -d /vagrant/htdocs/middleware/logs || mkdir /vagrant/htdocs/middleware/logs
 su vagrant -c "cd /vagrant/htdocs/middleware && ./install.sh" > /dev/null 2>&1
 
 # Search node config

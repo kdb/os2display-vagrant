@@ -5,6 +5,15 @@ if [[ $MODE == 'dev' ]]; then
     echo "Provisioning in DEVELOPMENT mode - git-cloned bundles will be used"
 fi
 
+# size of swapfile in megabytes
+swapsize=8000
+
+echo 'swapfile not found. Adding swapfile.'
+fallocate -l 8000M /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo '/swapfile none swap defaults 0 0' >> /etc/fstab
 # APT
 echo "Updating APT"
 apt-get update > /dev/null 2>&1

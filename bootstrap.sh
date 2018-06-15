@@ -704,6 +704,7 @@ echo "Setting up composer"
 cd /vagrant/htdocs/admin
 curl -sS http://getcomposer.org/installer | php  > /dev/null 2>&1
 mv /vagrant/htdocs/admin/composer.phar /usr/local/bin/composer
+composer global require hirak/prestissimo
 
 # Config file for admin_os2display
 cat > /vagrant/htdocs/admin/app/config/parameters.yml <<DELIM

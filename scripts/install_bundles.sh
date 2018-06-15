@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -exuo pipefail
 BOLD=$(tput bold)
 NORMAL=$(tput sgr0)
 
@@ -20,17 +20,33 @@ get_bundles() {
 		tokens=(${bundle//@/ })
 		repo=${tokens[0]}
 		# Fall back to master branch if we don't have a revision specified.
-		branch=${tokens[1]:-master}
-		echo "Cloning ${BOLD}$organization/$repo@$branch -> $BUNDLES_DIR/$organization/$repo${NORMAL}"
-		if [ ! -d ${repo} ]; then
-				git clone "https://github.com/$organization/$repo.git"
+		version=${tokens[1]:-master}
+		override_org=${tokens[2]:-}
+
+		if [[ -z "${override_org}" ]]; then
+            echo "Cloning ${BOLD}$organization/$repo@$version -> $BUNDLES_DIR/$organization/$repo${NORMAL}"
+            if [ ! -d ${repo} ]; then
+                    git clone "https://github.com/$organization/$repo.git"
+            fi
+            pushd "$repo"
+            git fetch --quiet
+            git checkout "$version" --quiet || (echo "Could not find revision revision $version" && exit 1)
+            git log --oneline --max-count=1
+            popd
+            echo
+        else
+            echo "Override repo ${override_org}"
+            echo "Cloning ${BOLD}$override_org/$organization-$repo@$version -> $BUNDLES_DIR/$organization/$repo${NORMAL}"
+            if [ ! -d ${repo} ]; then
+                    git clone "https://github.com/$override_org/$organization-$repo.git" "${repo}"
+            fi
+            pushd "$repo"
+            git fetch --quiet
+            git checkout "$version" --quiet || (echo "Could not find revision revision $version" && exit 1)
+            git log --oneline --max-count=1
+            popd
+            echo
 		fi
-		pushd "$repo"
-		git fetch --quiet
-		git checkout "$branch" --quiet || (echo "Could not find revision revision $branch" && exit 1)
-		git log --oneline --max-count=1
-		popd
-		echo
 	done
 }
 
@@ -43,11 +59,16 @@ configure_composer() {
 	for bundle in ${bundles[@]}; do
 		tokens=(${bundle//@/ })
 		repo=${tokens[0]}
-		branch=${tokens[1]:-master}
+		version=${tokens[1]:-dev-master}
+		override_org=${tokens[2]:-}
 
 		echo "Patching ${BOLD}../bundles/$organization/$repo${NORMAL} into composer-dev.json"
-
 		COMPOSER=composer-dev.json composer config repositories.$organization/$repo path ../bundles/$organization/$repo
+		if [[ -z "${override_org}" ]]; then
+            echo "Updating requrirement of ${BOLD}$organization/$repo${NORMAL} to ${BOLD}$organization/$repo:$version${NORMAL}"
+            COMPOSER=composer-dev.json composer require --no-update "$organization/$repo:$version"
+         fi
+
 	done
     popd
 }
@@ -68,7 +89,7 @@ if [ -e "${ADMIN_DIR}/composer-dev.json" ]; then
 fi
 cp -v "${ADMIN_DIR}/composer.json" "${ADMIN_DIR}/composer-dev.json"
 
-# For each bundle-file in bundle.d, source it and fetch the bundle
+# For each bundle-file in unset-bundle.d, source it and fetch the bundle
 for f in $(find ${SCRIPT_DIR}/bundle.d/ -name "*.bundle"); do
 	source $f;
 	get_bundles $organization $bundles

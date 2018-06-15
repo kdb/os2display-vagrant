@@ -25,7 +25,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # What to install
   config.vm.provision "shell" do |s|
-      s.env = { MODE: ENV['MODE'] || 'stable' }
-      s.path = "bootstrap.sh"
+
+    if ARGV[0] == 'up'
+        if ENV['MODE'] != "demo" && ENV['MODE'] != "dev"
+            puts 'Set the environment variable ENV to demo or dev before running vagrant up. Eg `MODE=dev vagrant up`'
+            abort
+        end
+    end
+
+    s.env = { MODE: ENV['MODE'] }
+    s.path = "bootstrap.sh"
   end
 end

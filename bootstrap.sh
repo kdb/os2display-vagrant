@@ -5,6 +5,10 @@ if [[ $MODE == 'dev' ]]; then
     echo "Provisioning in DEVELOPMENT mode - git-cloned bundles will be used"
 fi
 
+if [[ $MODE == 'demo' ]]; then
+    echo "Provisioning in DEMO mode"
+fi
+
 # size of swapfile in megabytes
 swapsize=8000
 
@@ -779,20 +783,20 @@ DELIM
 
 # If we're in dev mode, clone bundles and patch composer.json prior to
 # installing.
-
 if [[ $MODE == 'dev' ]]; then
     su --login vagrant -c "/vagrant/scripts/install_bundles.sh"
 fi
 
-# Use the dev override composer if available.
 echo "Composer installing admin, this will take a while..."
 
 # We disable xdebug while composer is running to give us a bit more speed.
 php5dismod -s cli xdebug
+
+# Use the dev override composer if available.
 if [[ -f composer-dev.json ]]; then
-    su --login vagrant -c "cd /vagrant/htdocs/admin && COMPOSER=composer-dev.json composer install"  > /dev/null 2>&1
+    su --login vagrant -c "cd /vagrant/htdocs/admin && COMPOSER=composer-dev.json composer install"
 else
-    su --login vagrant -c "cd /vagrant/htdocs/admin && composer install > /dev/null" 2>&1
+    su --login vagrant -c "cd /vagrant/htdocs/admin && composer install" > /dev/null 2>&1
 fi
 php5enmod -s cli xdebug
 

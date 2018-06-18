@@ -1,0 +1,15 @@
+# Stock bundles required by os2display.
+# Bundle <name>@<revision> must be available at 
+# github.com/<organization>/<name> and have a <revision> revision.
+# If the bundle is forked into a another repository the following pattern
+# <name>@<revision>@<fork org>
+# In with case the bundle is expected to be available at
+# github.com/<forked org>/<organization>-<name> and have a <revision> revision
+# In this case you will most likely need to specify a dev-<branchname> revision.
+organization=os2display
+bundles=(
+		admin-bundle@kdb-master@kdb
+		core-bundle@kdb-master@kdb
+		default-template-bundle@1.0.4
+		media-bundle@1.0.2
+)

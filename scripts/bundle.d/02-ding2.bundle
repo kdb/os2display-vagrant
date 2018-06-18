@@ -1,0 +1,7 @@
+# Stock bundles required by os2display.
+# Bundle <name>@<revision> must be available at 
+# github.com/<organization>/<name> and have a <revision> revision.
+organization=kdb
+bundles=(
+		os2display-kkbding2-bundle@master
+)

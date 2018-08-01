@@ -13,7 +13,7 @@ fi
 swapsize=8000
 
 echo 'swapfile not found. Adding swapfile.'
-fallocate -l 8000M /swapfile
+fallocate -l 10000M /swapfile
 chmod 600 /swapfile
 mkswap /swapfile
 swapon /swapfile

@@ -10,6 +10,6 @@ organization=os2display
 bundles=(
 		admin-bundle@kdb-master@kdb
 		core-bundle@kdb-master@kdb
-		default-template-bundle@1.0.4
+		default-template-bundle@1.1.0
 		media-bundle@1.0.2
 )

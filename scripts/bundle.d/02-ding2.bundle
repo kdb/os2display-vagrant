@@ -3,5 +3,5 @@
 # github.com/<organization>/<name> and have a <revision> revision.
 organization=kdb
 bundles=(
-		os2display-kkbding2-bundle@master
+		os2display-kkbding2-bundle
 )
